@@ -1,0 +1,86 @@
+local player = game.Players.LocalPlayer
+
+-- Tạo GUI
+local ScreenGui = Instance.new("ScreenGui", player.PlayerGui)
+ScreenGui.Name = "SimpleHub"
+
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0,220,0,180)
+Frame.Position = UDim2.new(0.4,0,0.3,0)
+Frame.BackgroundColor3 = Color3.fromRGB(40,40,40)
+Frame.Active = true
+Frame.Draggable = true -- kéo thả PC
+
+-- Tiêu đề
+local Title = Instance.new("TextLabel", Frame)
+Title.Size = UDim2.new(1,0,0,30)
+Title.Text = "🔥 Simple Blox Hub"
+Title.BackgroundColor3 = Color3.fromRGB(60,60,60)
+Title.TextColor3 = Color3.new(1,1,1)
+
+-- Hàm tạo nút
+local function createButton(text,posY,callback)
+	local btn = Instance.new("TextButton", Frame)
+	btn.Size = UDim2.new(0.8,0,0,35)
+	btn.Position = UDim2.new(0.1,0,0,posY)
+	btn.Text = text
+	
+	btn.MouseButton1Click:Connect(callback)
+end
+
+-- Nút 1
+createButton("Test Skill ⚔️",40,function()
+	print("Bạn dùng skill!")
+end)
+
+-- Nút 2
+createButton("Speed Boost ⚡",80,function()
+	local char = player.Character
+	if char and char:FindFirstChild("Humanoid") then
+		char.Humanoid.WalkSpeed = 30
+	end
+end)
+
+-- Nút 3
+createButton("Reset Speed 🔄",120,function()
+	local char = player.Character
+	if char and char:FindFirstChild("Humanoid") then
+		char.Humanoid.WalkSpeed = 16
+	end
+end)
+
+-- Drag mobile
+local UIS = game:GetService("UserInputService")
+local dragging, dragInput, dragStart, startPos
+
+Frame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = Frame.Position
+	end
+end)
+
+Frame.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - dragStart
+		Frame.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+Frame.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Touch then
+		dragging = false
+	end
+end)
